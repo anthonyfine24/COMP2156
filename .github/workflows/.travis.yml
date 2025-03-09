@@ -1,29 +1,28 @@
-name: Node.js CI
+language: node_js
+node_js:
+  - "stable"
 
-on:
-  push:
-    branches: 
-      - main
-  pull_request:
-    branches:
-      - main
+branches:
+  only:
+  - master
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+cache:
+  directories:
+  - node_modules
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
+install:
+  - npm install
+  - npm install -g yarn
 
-      - name: Install dependencies
-        run: |
-          npm install
-          
-      - name: Run tests
-        run: |
-          npm run
+script:
+  #- yarn lint
+  - yarn build
+  - mv build/index.html build/404.html
+  
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $github_token
+  local_dir: build
+  on:
+    branch: master
